@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="https://media-hosting.imagekit.io//724b8b6922bc4052/bitcoin.png?Expires=1833852776&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=WHFqQLsH6~BzKnDgH6Coy2N7Orw24pLFzUlbjoeiJYk7N9SFMWc466QhmPwVcE9-kilnRq9XUeaUIv2HCQPiN9wAcm3d97nkHDHQisOdyBLpXO~LTksoohg5YxPmkco0zZLUS8NU8fNVzUTbwfqQHsQhcJnC0-5YPlZTyryJRLEryUAKshaSQQ-BSdroGGBShX-m~C7cNtzXp95ChFO4nuk9aoiWVQTzzHiuJGhcJxpq2T2WJJSYvrp2DWQl-I0vHyoxGLsviOxxrIw90ddI3e6AO5msx2T9tIETGO1baBoY5Kahnf7Uz5czhAa63VJeQtB-NAg6AZOEqiVAzuhSaQ__">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitcoin Live Transactions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 32px;
+      background: linear-gradient(45deg, #f9c900, #ffbc00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e1e1e;
+      box-shadow: 0px 4px 10px rgba(255, 188, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+      font-size: 14px;
+      word-wrap: break-word;
+    }
+    th {
+      background-color: #f9c900;
+      color: #fff;
+    }
+    tr:nth-child(even) {
+      background-color: #2a2a2a;
+    }
+    tr:hover {
+      background-color: #333;
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #bbb;
+    }
+    .txid {
+      word-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
+      color: #f9c900;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Live Bitcoin Transaction Tracker</h1>
+  <div id="status" class="status">Fetching latest transactions...</div>
+
+  <div class="table-container">
+    <table id="transactions-table">
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Value (BTC)</th>
+          <th>Size (Bytes)</th>
+          <th>Fee (BTC)</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    let seenTransactions = new Set();
+
+    function formatDate(timestamp) {
+      let date = new Date(timestamp * 1000);
+      return date.toLocaleString();
+    }
+
+    async function fetchTransactions() {
+      try {
+        document.getElementById('status').textContent = "Updating...";
+        const response = await fetch('https://blockstream.info/api/mempool/recent');
+        if (!response.ok) throw new Error("API Error: " + response.status);
+        const transactions = await response.json();
+        if (!transactions.length) return;
+
+        const tableBody = document.querySelector('#transactions-table tbody');
+        let newTxCount = 0;
+
+        transactions.slice(0, 10).forEach(tx => {
+          if (!seenTransactions.has(tx.txid)) {
+            seenTransactions.add(tx.txid);
+            newTxCount++;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td class="txid">${tx.txid}</td>
+              <td>${(tx.value / 100000000).toFixed(8)} BTC</td>
+              <td>${tx.vsize} Bytes</td>
+              <td>${(tx.fee / 100000000).toFixed(8)} BTC</td>
+              <td>${formatDate(tx.status?.block_time || Math.floor(Date.now() / 1000))}</td>
+            `;
+            tableBody.prepend(row);
+          }
+        });
+
+        document.getElementById('status').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+      } catch (error) {
+        document.getElementById('status').textContent = "Error fetching transactions.";
+        console.error("Transaction Fetch Error:", error);
+      }
+    }
+
+    fetchTransactions();
+    setInterval(fetchTransactions, 10000);
+  </script>
+
+</body>
+</html>

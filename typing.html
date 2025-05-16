@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            padding: 20px;
+        }
+        #word-container {
+            font-size: 24px;
+            margin: 20px auto;
+            width: 90%;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 10px 0;
+        }
+        #word-container::-webkit-scrollbar {
+            display: none;
+        }
+        .word {
+            display: inline-block;
+            margin: 0 10px;
+            color: #666;
+            transition: color 0.2s;
+        }
+        .word.active {
+            color: #fff;
+            text-decoration: underline;
+        }
+        .word.correct {
+            color: #4CAF50;
+        }
+        .word.incorrect {
+            color: #f44336;
+        }
+        #input-box {
+            width: 80%;
+            padding: 15px;
+            font-size: 18px;
+            background: #2d2d2d;
+            border: 2px solid #3d3d3d;
+            color: white;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        #stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 18px;
+        }
+        #results {
+            display: none;
+            margin-top: 20px;
+        }
+        #restart-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        #restart-btn:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Typing Speed Test</h1>
+    <div id="word-container"></div>
+    <input type="text" id="input-box" placeholder="Start typing..." autofocus>
+    <div id="stats">
+        <p>Time: <span id="timer">30</span>s</p>
+    </div>
+    <div id="results">
+        <h2>Final Score: <span id="final-wpm">0</span> WPM</h2>
+        <p>Accuracy: <span id="final-accuracy">100</span>%</p>
+        <button id="restart-btn">Restart Test</button>
+    </div>
+
+    <script>
+        const words = ["possible", "know", "face", "public", "however", "order", "must", "say", 
+                      "through", "while", "keep", "real", "develop", "general", "under", "one", 
+                      "follow", "they", "show", "up", "word", "other", "possible", "feel", "stand", 
+                      "same", "many", "general", "well", "feel", "become"];
+        
+        let currentIndex = 0;
+        let startTime = null;
+        let timerInterval = null;
+        let correctChars = 0;
+        let totalChars = 0;
+        let wordCount = 0;
+
+        const wordContainer = document.getElementById("word-container");
+        const inputBox = document.getElementById("input-box");
+        const timerDisplay = document.getElementById("timer");
+        const resultsDiv = document.getElementById("results");
+        const finalWpm = document.getElementById("final-wpm");
+        const finalAccuracy = document.getElementById("final-accuracy");
+
+        function initializeWords() {
+            wordContainer.innerHTML = '';
+            currentIndex = 0;
+            for (let i = 0; i < 30; i++) {
+                addNewWord();
+            }
+        }
+
+        function addNewWord() {
+            const wordSpan = document.createElement('span');
+            wordSpan.className = 'word';
+            wordSpan.textContent = words[currentIndex % words.length];
+            if (wordContainer.children.length === 0) {
+                wordSpan.classList.add('active');
+            }
+            wordContainer.appendChild(wordSpan);
+            currentIndex++;
+        }
+
+        function startTimer() {
+            let timeLeft = 30;
+            startTime = Date.now();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    inputBox.disabled = true;
+                    inputBox.placeholder = 'Time expired!';
+                    showFinalResults();
+                }
+            }, 1000);
+        }
+
+        function scrollToWord() {
+            const activeWord = document.querySelector('.word.active');
+            if (activeWord) {
+                const containerWidth = wordContainer.offsetWidth;
+                const wordLeft = activeWord.offsetLeft;
+                const wordWidth = activeWord.offsetWidth;
+                
+                const scrollPosition = wordLeft - (containerWidth/2) + (wordWidth/2);
+                wordContainer.scrollTo({
+                    left: scrollPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function showFinalResults() {
+            document.getElementById('stats').style.display = 'none';
+            resultsDiv.style.display = 'block';
+            const totalMinutes = 0.5;
+            const wpm = Math.round(wordCount / totalMinutes);
+            const accuracy = Math.round((correctChars / totalChars) * 100) || 100;
+            
+            finalWpm.textContent = wpm;
+            finalAccuracy.textContent = accuracy > 100 ? 100 : accuracy;
+        }
+
+        function resetTest() {
+            // Reset all variables
+            currentIndex = 0;
+            correctChars = 0;
+            totalChars = 0;
+            wordCount = 0;
+            startTime = null;
+            
+            // Clear existing timer
+            clearInterval(timerInterval);
+            timerInterval = null;
+            
+            // Reset UI elements
+            timerDisplay.textContent = '30';
+            inputBox.disabled = false;
+            inputBox.placeholder = 'Start typing...';
+            inputBox.value = '';
+            document.getElementById('stats').style.display = 'flex';
+            resultsDiv.style.display = 'none';
+            
+            // Reset scroll position
+            wordContainer.scrollLeft = 0;
+            
+            // Reinitialize words
+            initializeWords();
+            
+            // Set focus to input field
+            inputBox.focus();
+        }
+
+        inputBox.addEventListener('input', (e) => {
+            if (!startTime) startTimer();
+            
+            const currentWord = document.querySelector('.word.active');
+            if (!currentWord) return;
+            
+            const inputVal = inputBox.value.trim();
+            totalChars++;
+            
+            if (inputVal === currentWord.textContent) {
+                correctChars += currentWord.textContent.length;
+                wordCount++;
+                
+                currentWord.classList.remove('active', 'incorrect');
+                currentWord.classList.add('correct');
+                
+                addNewWord();
+                
+                const nextWord = currentWord.nextElementSibling;
+                if (nextWord) {
+                    nextWord.classList.add('active');
+                }
+                
+                inputBox.value = '';
+                scrollToWord();
+            } else {
+                currentWord.classList.toggle('incorrect', 
+                    !currentWord.textContent.startsWith(inputVal));
+            }
+        });
+
+        document.getElementById('restart-btn').addEventListener('click', resetTest);
+        initializeWords();
+    </script>
+</body>
+</html>

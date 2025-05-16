@@ -3,63 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://fonts.googleapis.com/css?family=Waiting+for+the+Sunrise" rel="stylesheet" type="text/css"/>
+    <title>I <3 AIF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Waiting for the Sunrise', cursive; 
-            font-size: 30px; 
-            margin: 10px 50px; 
-            letter-spacing: 6px; 
-            font-weight: bold;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
-    </style>
-    <script>
-        // set up text to print, each item in array is new line
-        var aText = new Array(
-            "Herrow", 
-             "Herrow",
- "Herrow",
- "Herrow",
-            "My girlfriends so pretty"
-        );
-        var iSpeed = 100; // time delay of print out
-        var iIndex = 0; // start printing array at this position
-        var iArrLength = aText[0].length; // the length of the text array
-        var iScrollAt = 20; // start scrolling up at this many lines
-         
-        var iTextPos = 0; // initialise text position
-        var sContents = ''; // initialise contents variable
-        var iRow; // initialise current row
-         
-        function typewriter() {
-            sContents = ' ';
-            iRow = Math.max(0, iIndex - iScrollAt);
-            var destination = document.getElementById("typedtext");
-            
-            while (iRow < iIndex) {
-                sContents += aText[iRow++] + '<br />';
-            }
-            destination.innerHTML = sContents + aText[iIndex].substring(0, iTextPos) + "_";
-            if (iTextPos++ == iArrLength) {
-                iTextPos = 0;
-                iIndex++;
-                if (iIndex != aText.length) {
-                    iArrLength = aText[iIndex].length;
-                    setTimeout(typewriter, 500);
-                }
-            } else {
-                setTimeout(typewriter, iSpeed);
+
+        body {
+            background: linear-gradient(135deg, #f6f9fc 0%, #edf2f7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 1400px;
+            min-height: 90vh;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #000000, #000000);
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #000000 0%, #000000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.03em;
+        }
+
+        .work-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .work-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            max-width: 100%;
+        }
+
+        .work-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .work-image-container {
+            position: relative;
+            overflow: hidden;
+            height: 160px;
+            width: 100%;
+        }
+
+        .typing-test-image {
+            background: #1a1a1a;
+        }
+
+        .work-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+            display: block;
+        }
+
+        .work-card:hover .work-image {
+            transform: scale(1.1);
+        }
+
+        .work-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            width: 100%;
+            background: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .work-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .work-description {
+            color: #4b5563;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+.work-tech {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+
+        .tech-tag {
+            background: #f3f4f6;
+            color: #4b5563;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 1200px) {
+            .work-container {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
-        // Call typewriter after DOM is loaded
-        document.addEventListener("DOMContentLoaded", function() {
-            typewriter();
-        });
-    </script>
+        @media (max-width: 768px) {
+            .container {
+                padding: 2rem;
+                min-height: auto;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .work-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="typedtext"></div>
+    <div class="container">
+        <div class="header">
+            <h1>AIF</h1>
+        </div>
+
+        <div class="work-container">
+            <a href="typing.html" class="work-card">
+                <div class="work-image-container typing-test-image">
+                    <img src="https://i.ibb.co/1tPZ5rBJ/Screenshot-2025-02-10-175159.png" alt="Typing Speed Test Interface" class="work-image">
+                </div>
+                <div class="work-content">
+                    <div class="work-title">Typing Speed Test</div>
+                    <div class="work-description">
+                        Test and improve your typing speed with this sleek, dark-themed application featuring real-time word suggestions and accuracy tracking.
+                    </div>
+                    <div class="work-tech">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">JavaScript</span>
+                    </div>
+                </div>
+            </a>
+
+            <a href="crypto.html" class="work-card">
+                <div class="work-image-container">
+                    <img src="https://i.ibb.co/Z3RJB4D/image.png" alt="Task Manager" class="work-image">
+                </div>
+                <div class="work-content">
+                    <div class="work-title">Cryptocurrencie Price Tracker</div>
+                    <div class="work-description">
+                        Real-time data that represents the 15 cryptocurrencies by marketcap.
+                    </div>
+                    <div class="work-tech">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">Javascript</span>
+                        <span class="tech-tag">Coingecko API</span>
+                    </div>
+                </div>z
+            </a>
+
+            <a href="bitcoin transaction.html" class="work-card">
+                <div class="work-image-container">
+                    <img src="https://i.ibb.co/DDWvLgh7/image.png" alt="Weather App" class="work-image">
+                </div>
+                <div class="work-content">
+                    <div class="work-title">Live Bitcoin Transactions</div>
+                    <div class="work-description">
+                        Real-time bitcoin transactions, updated every 5 seconds.
+                    </div>
+                    <div class="work-tech">
+                        <span class="tech-tag">HTML</span>
+                        <span class="tech-tag">CSS</span>
+                        <span class="tech-tag">Javascript</span>
+                        <span class="tech-tag">Blockstream API</span>
+                    </div>
+                </div>
+            </a>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
 </body>
 </html>

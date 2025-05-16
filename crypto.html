@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://media-hosting.imagekit.io//724b8b6922bc4052/bitcoin.png?Expires=1833852776&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=WHFqQLsH6~BzKnDgH6Coy2N7Orw24pLFzUlbjoeiJYk7N9SFMWc466QhmPwVcE9-kilnRq9XUeaUIv2HCQPiN9wAcm3d97nkHDHQisOdyBLpXO~LTksoohg5YxPmkco0zZLUS8NU8fNVzUTbwfqQHsQhcJnC0-5YPlZTyryJRLEryUAKshaSQQ-BSdroGGBShX-m~C7cNtzXp95ChFO4nuk9aoiWVQTzzHiuJGhcJxpq2T2WJJSYvrp2DWQl-I0vHyoxGLsviOxxrIw90ddI3e6AO5msx2T9tIETGO1baBoY5Kahnf7Uz5czhAa63VJeQtB-NAg6AZOEqiVAzuhSaQ__">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 100 Cryptos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: white;
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #333;
+            padding: 18px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+        th, td {
+            padding: 9px;
+            border: 1px solid #555;
+        }
+        th {
+            background-color: #444;
+            font-size: 15px;
+        }
+        td {
+            font-size: 13px;
+        }
+        .refresh-btn {
+            margin-top: 12px;
+            padding: 8px 18px;
+            font-size: 15px;
+            background: #ffcc00;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .crypto-logo {
+            width: 22px;
+            height: 22px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .positive {
+            color: #0f0;
+        }
+        .negative {
+            color: #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Top 100 Cryptocurrencies</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price (USD)</th>
+                    <th>1h %</th>
+                    <th>24h %</th>
+                    <th>7d %</th>
+                    <th>Market Cap</th>
+                    <th>Volume (24h)</th>
+                    <th>Circulating Supply</th>
+                </tr>
+            </thead>
+            <tbody id="crypto-table">
+                <tr><td colspan="8">Loading...</td></tr>
+            </tbody>
+        </table>
+        <button class="refresh-btn" onclick="fetchCryptoData()">Refresh Prices</button>
+    </div>
+    <script>
+        async function fetchCryptoData() {
+            const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h,24h,7d";
+            try {
+                const response = await fetch(url);
+                let data = await response.json();
+                
+                // Filter out wrapped and staked cryptocurrencies
+                data = data.filter(coin => !coin.id.includes("wrapped") && !coin.id.includes("staked"));
+                
+                const tableBody = document.getElementById("crypto-table");
+                tableBody.innerHTML = "";
+                
+                data.forEach(coin => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td><img src="${coin.image}" alt="${coin.name}" class="crypto-logo"> ${coin.name} (${coin.symbol.toUpperCase()})</td>
+                        <td>$${coin.current_price.toLocaleString()}</td>
+                        <td class="${coin.price_change_percentage_1h_in_currency >= 0 ? 'positive' : 'negative'}">${coin.price_change_percentage_1h_in_currency.toFixed(2)}%</td>
+                        <td class="${coin.price_change_percentage_24h >= 0 ? 'positive' : 'negative'}">${coin.price_change_percentage_24h.toFixed(2)}%</td>
+                        <td class="${coin.price_change_percentage_7d_in_currency >= 0 ? 'positive' : 'negative'}">${coin.price_change_percentage_7d_in_currency.toFixed(2)}%</td>
+                        <td>$${coin.market_cap.toLocaleString()}</td>
+                        <td>$${coin.total_volume.toLocaleString()}</td>
+                        <td>${coin.circulating_supply.toLocaleString()}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        }
+        fetchCryptoData();
+    </script>
+</body>
+</html>
